@@ -1,29 +1,34 @@
 package metier;
 
+
 import dao.IDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+import org.springframework.beans.factory.InitializingBean;
+
 @Component("metier")  // Déclare cette classe comme un bean Spring avec l'identifiant "metier"
-public class MetierImpl implements IMetier{
-	
-	 // Injection de dépendance : Spring injectera automatiquement une implémentation de IDao
+public class MetierImpl implements IMetier, InitializingBean {
+
+    // Injection de dépendance : Spring injectera automatiquement une implémentation de IDao
     @Autowired
-    @Qualifier("dao2")  // Spécifie quelle implémentation de IDao utiliser
-    private IDao dao;  // Par défaut, Spring injectera le premier bean compatible trouvé
-    
-    
+    private IDao dao;  // Spring choisira automatiquement le bean actif selon le profil
+
+    @Override
+    public void afterPropertiesSet() {
+        System.out.println("[TRACE] DAO injecté = " + dao.getClass().getSimpleName());
+    }
+
     @Override
     public double calcul() {
         // Utilise la méthode getValue() de l'implémentation injectée de IDao
         // et multiplie le résultat par 2
         return dao.getValue() * 2;
     }
-    
+
     // Setter pour l'injection par setter (alternative à l'injection par champ)
     public void setDao(IDao dao) {
         this.dao = dao;
     }
-
 }

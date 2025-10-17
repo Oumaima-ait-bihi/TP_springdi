@@ -1,31 +1,28 @@
 package presentation;
 
 import metier.IMetier;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.*;
 
-
-
-@Configuration  // Indique que cette classe contient des configurations Spring
-@ComponentScan(basePackages = {"com.example.dao", "com.example.metier"})  // Indique à Spring de scanner ces packages pour trouver des beans
+@Configuration
+@ComponentScan(basePackages = {"com.example.dao", "com.example.metier"})
 public class Presentation2 {
-	
-	 public static void main(String[] args) {
-	        // Création du contexte Spring basé sur les annotations
+    public static void main(String[] args) {
+        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();
 
-	        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
-	        context.getEnvironment().setActiveProfiles("dev");  // Active le profil "dev"
-	        context.register(Presentation2.class);
-	        context.refresh();
-	        
-	        // Récupération du bean IMetier depuis le conteneur Spring
-	        IMetier metier = context.getBean(IMetier.class);
-	        
-	        // Exécution de la méthode calcul() et affichage du résultat
-	        System.out.println("Résultat = " + metier.calcul());
-	    }
-	
+        // Choix 1 (profils) : décommenter un profil pour tester
+         // ctx.getEnvironment().setActiveProfiles("dev");   // -> DaoImpl2 (150) => 300
+         ctx.getEnvironment().setActiveProfiles("prod");  // -> DaoImpl  (100) => 200
+        // ctx.getEnvironment().setActiveProfiles("file");  // -> DaoFile  (180) => 360
+        // ctx.getEnvironment().setActiveProfiles("api");   // -> DaoApi   (220) => 440
 
+        // Choix 2 (propriété externe) : laisser les profils vides,
+        // PropertyDrivenConfig créera un bean "dao" selon app.properties
+
+        ctx.register(Presentation2.class);
+        ctx.refresh();
+
+        IMetier metier = ctx.getBean(IMetier.class);
+        System.out.println("Résultat = " + metier.calcul());
+        ctx.close();
+    }
 }

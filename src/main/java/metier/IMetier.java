@@ -1,6 +1,6 @@
 package metier;
 
-public interface IMetier {
-	double calcul();
 
+public interface IMetier {
+    double calcul();
 }
